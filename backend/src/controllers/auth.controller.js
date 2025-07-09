@@ -122,30 +122,31 @@ export const logout = async (req, res) => {
 
 export const onboard = async (req, res) => {
     try {
-    const { fullName, bio, nativeLanguage, learningLanguage, location, profilePicture } = req.body;
+    const userId = req.user._id;
+    const { fullName, bio, nativeLanguage, learningLanguage, location} = req.body;
 
-    if(!fullName || !nativeLanguage || !learningLanguage) {
+    if(!fullName || !bio || !location || !nativeLanguage || !learningLanguage) {
         return res.status(400).json({ message: "All fields are required", 
             missingFields: [
                 !fullName && "Full name is required",
+                !bio && "Bio is required",
+                !location && "Location is required",
                 !nativeLanguage && "Native language is required",
                 !learningLanguage && "Learning language is required",
-                !location && "Location is optional",
-                !bio && "Bio is optional",
-                !profilePicture && "Profile picture is optional"
             ].filter(Boolean),
          })
     }
-        await User.findByIdAndUpdate(req.user._id, {
-            fullName,
-            bio,
-            nativeLanguage,
-            learningLanguage,
-            location,
-            profilePicture: profilePicture 
-        }, { new: true });
+        // await User.findByIdAndUpdate(req.user._id, {
+        //     fullName,
+        //     bio,
+        //     nativeLanguage,
+        //     learningLanguage,
+        //     location,
+        //     profilePicture: profilePicture 
+        // }, { new: true });
 
-        const updatedUser = await User.findByIdAndUpdate(req.user._id,
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
             {
                 ...req.body,
                 isOnboarded: true,
@@ -160,10 +161,9 @@ export const onboard = async (req, res) => {
         // Upsert user in Stream
         try {
             await upsertStreamUser({
-                id: updatedUser._id,
-                email: updatedUser.email,
+                id: updatedUser._id.toString(),
                 name: updatedUser.fullName,
-                image: updatedUser.profilePicture
+                image: updatedUser.profilePicture || "",
             });
             console.log(`Stream user upserted successfully for user ID: ${updatedUser.fullName}`);
         } catch (error) {
@@ -174,6 +174,7 @@ export const onboard = async (req, res) => {
 
         res.status(200).json({ success: true, message: "User onboarding successful" ,user: updatedUser });
     } catch (error) {
+        console.error("Error in onboarding:", error);
         return res.status(500).json({ message: "Error in onboarding: Internal server error" });
         
     }
