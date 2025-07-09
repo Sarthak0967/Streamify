@@ -26,6 +26,7 @@ const CallPage = () => {
   const [client, setClient] = useState(null);
   const [call, setCall] = useState(null);
   const [isConnecting, setIsConnecting] = useState(true);
+  const navigate = useNavigate();
 
   const { authUser, isLoading } = useAuthUser();
 
@@ -35,6 +36,13 @@ const CallPage = () => {
     queryFn: getStreamToken,
     enabled: !!authUser,
   });
+
+  useEffect(() => {
+    if (!callId || callId === ':' || callId.trim() === '') {
+      toast.error("Invalid or missing call ID.");
+      navigate('/');
+    }
+  }, [callId, navigate]);
 
   useEffect(() => {
     const initCall = async () => {
