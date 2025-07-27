@@ -1,5 +1,6 @@
 import { StreamChat } from "stream-chat";
 import "dotenv/config.js";
+import logger from './logger.js';
 
 
 const streamSecret = process.env.STREAM_API_SECRET;
@@ -22,7 +23,7 @@ export const upsertStreamUser = async (userData) => {
         await streamClient.upsertUsers([userData]);
         return userData;
     } catch (error) {
-        console.error("Error in upsertStreamUser:", error);
+        logger.error("Error in upsertStreamUser: %s", error);
         throw new Error("Failed to upsert Stream user");
         
     }
@@ -36,7 +37,7 @@ export const generateStreamToken = (userId) => {
         }
         return streamClient.createToken(userIdString);
     } catch (error) {
-        console.error("Error generating Stream token:", error);
+        logger.error("Error generating Stream token: %s", error);
         throw new Error("Failed to generate Stream token");
         
     }

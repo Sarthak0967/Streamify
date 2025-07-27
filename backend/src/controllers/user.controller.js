@@ -1,5 +1,6 @@
 import User from '../models/User.model.js';
 import FriendRequest from '../models/FriendRequest.model.js';
+import logger from '../lib/logger.js';
 
 export const getRecommendedUsers = async(req, res) => {
     try {
@@ -16,7 +17,7 @@ export const getRecommendedUsers = async(req, res) => {
         // console.log("Recommended users:", recommendedUsers);
         res.status(200).json(recommendedUsers);
     } catch (error) {
-        console.error("Error fetching recommended users:", error);
+        logger.error("Error fetching recommended users: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }
@@ -29,7 +30,7 @@ export const getFriends = async (req, res) => {
         .populate("friends", "fullName profilePicture nativeLanguage learningLanguage");
         res.status(200).json(user.friends);
     } catch (error) {
-        console.error("Error fetching friends:", error);
+        logger.error("Error fetching friends: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }
@@ -76,7 +77,7 @@ export const sendFriendRequest = async (req, res) => {
         res.status(201).json(friendRequest);
 
     } catch (error) {
-        console.error("Error fetching friend requests:", error);
+        logger.error("Error fetching friend requests: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }
@@ -111,7 +112,7 @@ export const acceptFriendRequests = async (req, res) => {
         res.status(200).json({ message: "Friend request accepted successfully." });
 
     } catch (error) {
-        console.error("Error accepting friend requests:", error);
+        logger.error("Error accepting friend requests: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }
@@ -131,7 +132,7 @@ export const getFriendRequests = async (req, res) => {
 
         res.status(200).json({ incomingRequests, acceptFriendRequests });
     } catch (error) {
-        console.error("Error fetching friend requests:", error);
+        logger.error("Error fetching friend requests: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }
@@ -146,7 +147,7 @@ export const getOutgoingFriendRequests = async (req, res) => {
 
         res.status(200).json(outgoingRequests);
     } catch (error) {
-        console.error("Error fetching outgoing friend requests:", error);
+        logger.error("Error fetching outgoing friend requests: %s", error);
         return res.status(500).json({ message: "Internal server error" });
         
     }

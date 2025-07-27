@@ -1,6 +1,7 @@
 import User from "../models/User.model.js";
 import jwt from "jsonwebtoken";
 import { upsertStreamUser } from "../lib/stream.js";
+import logger from '../lib/logger.js';
 
 
 export const signup = async (req, res) => {
@@ -45,9 +46,9 @@ export const signup = async (req, res) => {
                 name: newUser.fullName,
                 image: newUser.avatar
             });
-            console.log(`Stream user upserted successfully for user ID: ${newUser._id}`);
+            logger.info(`Stream user upserted successfully for user ID: ${newUser._id}`);
         } catch (error) {
-            console.error("Error upserting Stream user:", error);
+            logger.error("Error upserting Stream user: %s", error);
             return res.status(500).json({ message: "Failed to create user in Stream" });
             
         }
@@ -165,16 +166,16 @@ export const onboard = async (req, res) => {
                 name: updatedUser.fullName,
                 image: updatedUser.profilePicture || "",
             });
-            console.log(`Stream user upserted successfully for user ID: ${updatedUser.fullName}`);
+            logger.info(`Stream user upserted successfully for user ID: ${updatedUser.fullName}`);
         } catch (error) {
-            console.error("Error upserting Stream user:", error);
+            logger.error("Error upserting Stream user: %s", error);
             return res.status(500).json({ message: "Failed to update user in Stream" });
         }
 
 
         res.status(200).json({ success: true, message: "User onboarding successful" ,user: updatedUser });
     } catch (error) {
-        console.error("Error in onboarding:", error);
+        logger.error("Error in onboarding: %s", error);
         return res.status(500).json({ message: "Error in onboarding: Internal server error" });
         
     }
