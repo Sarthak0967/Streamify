@@ -9,7 +9,6 @@ import {
   StreamVideo,
   StreamVideoClient,
   StreamCall,
-  CallControls,
   SpeakerLayout,
   StreamTheme,
   CallingState,
@@ -18,6 +17,9 @@ import {
 
 import '@stream-io/video-react-sdk/dist/css/styles.css';
 import PageLoader from '../components/PageLoader.jsx';
+import CustomCallControls from '../components/CustomCallControls.jsx';
+import ScreenShareIndicator from '../components/ScreenShareIndicator.jsx';
+import { useScreenShare } from '../hooks/useScreenShare';
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -29,7 +31,6 @@ const CallPage = () => {
   const navigate = useNavigate();
 
   const { authUser, isLoading } = useAuthUser();
-
 
   const { data: tokenData } = useQuery({
     queryKey: ["streamToken"],
@@ -50,7 +51,6 @@ const CallPage = () => {
         console.warn("Missing or invalid callId:", callId);
         return;
       }
-
 
       try {
         console.log("Initializing Stream Video Call...");
@@ -79,7 +79,6 @@ const CallPage = () => {
       } finally {
         setIsConnecting(false);
       }
-
     };
 
     initCall();
@@ -90,10 +89,21 @@ const CallPage = () => {
   return (
     <div className="h-screen flex flex-col items-center justify-center">
       <div className="relative">
+        {/* Instructions Banner */}
+        <div className="absolute top-4 right-4 z-50 bg-base-200 text-base-content px-4 py-2 rounded-lg shadow-lg max-w-xs">
+          <h3 className="font-semibold text-sm mb-2">💡 Screen Sharing Tips</h3>
+          <ul className="text-xs space-y-1">
+            <li>• Click the Share button to start</li>
+            <li>• Choose screen, window, or tab to share</li>
+            <li>• Use browser controls to stop sharing</li>
+            <li>• Currently in preview mode</li>
+          </ul>
+        </div>
+
         {client && call ? (
           <StreamVideo client={client}>
             <StreamCall call={call}>
-              <CallContent />
+              <CallContent call={call} />
             </StreamCall>
           </StreamVideo>
         ) : (
@@ -106,9 +116,10 @@ const CallPage = () => {
   );
 };
 
-const CallContent = () => {
+const CallContent = ({ call }) => {
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
+  const { isScreenSharing } = useScreenShare(call);
 
   const navigate = useNavigate();
 
@@ -116,8 +127,14 @@ const CallContent = () => {
 
   return (
     <StreamTheme>
+      {/* Screen Share Indicator */}
+      <ScreenShareIndicator 
+        isScreenSharing={isScreenSharing}
+        userName="You"
+      />
+      
       <SpeakerLayout />
-      <CallControls />
+      <CustomCallControls call={call} />
     </StreamTheme>
   );
 };

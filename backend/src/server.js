@@ -29,14 +29,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-// Removed static frontend serving for separate deployment
-// if(process.env.NODE_ENV === 'production') {
-//     app.use(express.static(path.join(__dirname, '../frontend/dist')));
-//
-//     app.get("*", (req,res) => {
-//         res.sendFile(path.join(__dirname, '../frontend','dist', 'index.html'));
-//     });
-// }
+if(process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+    app.get("*", (req,res) => {
+        res.sendFile(path.join(__dirname, '../frontend','dist', 'index.html'));
+    });
+}
      
 
 app.listen(PORT, () => {
